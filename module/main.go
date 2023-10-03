@@ -11,6 +11,6 @@ func main() {
 
 	for {
 		text, _ := reader.ReadString('\n')
-		fmt.Println(text)
+		fmt.Printf("bloof: %s\b", text)
 	}
 }
