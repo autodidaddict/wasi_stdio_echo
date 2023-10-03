@@ -34,21 +34,23 @@ func main() {
 		log.Fatal(err)
 	}
 
-	pipeRead, pipeWrite, err := os.Pipe()
+	stdinRead, stdinWrite, err := os.Pipe()
+	stdoutRead, stdoutWrite, err := os.Pipe()
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	config := wazero.NewModuleConfig().
-		WithStdout(pipeWrite).
-		WithStdin(pipeRead).
+		WithStdout(stdoutWrite).
+		WithStdin(stdinRead).
 		WithStderr(os.Stderr).
 		WithName("excellent")
 
 	go func() {
-		pipeWrite.WriteString("this should be echoed\n")
+		stdinWrite.WriteString("this should be echoed\n")
 		fmt.Println("Wrote to pipe")
-		reader := bufio.NewReader(pipeRead)
+		reader := bufio.NewReader(stdoutRead)
 		response, err := reader.ReadString('\n')
 		if err != nil {
 			log.Fatal(err)
