@@ -6,11 +6,14 @@ import (
 	"os"
 )
 
-func main() {
+func init() {
+	fmt.Println("> ")
 	reader := bufio.NewReader(os.Stdin)
-
 	for {
 		text, _ := reader.ReadString('\n')
-		fmt.Println(text)
+		fmt.Println("MODULE: " + text)
 	}
+}
+
+func main() {
 }

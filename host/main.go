@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"context"
 	"flag"
 	"fmt"
@@ -34,28 +33,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	pipeRead, pipeWrite, err := os.Pipe()
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	config := wazero.NewModuleConfig().
-		WithStdout(pipeWrite).
-		WithStdin(pipeRead).
+		WithStdout(os.Stdout).
+		WithStdin(os.Stdin).
 		WithStderr(os.Stderr).
+		WithArgs("excellent").
 		WithName("excellent")
-
-	go func() {
-		pipeWrite.WriteString("this should be echoed\n")
-		fmt.Println("Wrote to pipe")
-		reader := bufio.NewReader(pipeRead)
-		response, err := reader.ReadString('\n')
-		if err != nil {
-			log.Fatal(err)
-			return
-		}
-		fmt.Printf("Got reply: %s\n", response)
-	}()
 
 	fmt.Println("Instantiating module")
 	mod, err := r.InstantiateModule(ctx, code, config)
@@ -66,9 +49,4 @@ func main() {
 	}
 	fmt.Println("Finished instantiating")
 	defer mod.Close(ctx)
-
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Enter to quit")
-	reader.ReadString('\n')
-
 }
